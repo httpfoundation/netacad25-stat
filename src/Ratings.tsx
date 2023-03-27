@@ -15,7 +15,10 @@ const Ratings = () => {
 	const peopleDidRatingRegistrationIds = ratings.map(r => r.registration)
 	console.log({peopleDidRatingRegistrationIds})
 	const peopleDidRating = regs.filter(r => peopleDidRatingRegistrationIds.includes(r.id))
+	console.log({regs})
 	console.log({peopleDidRating})
+	const peopleDidNotRating = regs.filter(r => !peopleDidRatingRegistrationIds.includes(r.id))
+	console.log({peopleDidNotRating})
 	
 	const recommendedTopics = [] as Array<{recommendedTopic: string, registration: string}>
 	const comments = [] as Array<{comment: string, registration: string}>
@@ -82,7 +85,12 @@ const Ratings = () => {
 				<Typography variant="body1">{c.comment}</Typography>
 			</CardContent>
 		</Card>)}
-		<CSVExportLink registrations={peopleDidRating} fileName="iok2023_ertekelok.csv"  buttonTitle="Értékelő vendégek exportálása CSV fájlba" />
+		<Box>
+			<CSVExportLink registrations={peopleDidRating} fileName="iok2023_ertekelok.csv"  buttonTitle="Értékelő vendégek exportálása CSV fájlba" />
+		</Box>
+		<Box>
+			<CSVExportLink registrations={peopleDidNotRating} fileName="iok2023_nem_ertekelok.csv"  buttonTitle="Nem értékelő vendégek exportálása CSV fájlba" />
+		</Box>
 	</>
 }
 
