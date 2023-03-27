@@ -1,27 +1,6 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, CardContent, Card, Typography, Stack, Grid } from "@mui/material"
-import { useEffect, useState } from "react"
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, CardContent, Card, Typography, Stack, Grid, Button } from "@mui/material"
 import { useGetAll } from "./tools/datoCmsTools"
-
-type Attendance = {
-	id: string,
-	date: string,
-	path: string,
-}
-
-const notOlderThan = (date: string, minutes: number) => {
-	const now = new Date()
-	const then = new Date(date)
-	return now.getTime() - then.getTime() < minutes * 60 * 1000
-}
-
-const formatDate = (date: string|Date) => {
-	const d = new Date(date)
-	return d.toLocaleTimeString('hu-HU', {
-		hour: "2-digit",
-		minute: "2-digit",
-		second: "2-digit",
-	})
-}
+import { CSVExportLink } from "./CSVExportLink"
 
 const Ratings = () => {
 	const _ratings = useGetAll("rating") as Array<{
@@ -30,36 +9,14 @@ const Ratings = () => {
 	const regs = useGetAll("registration") as Array<{id: string, name: string, email: string, phone: string, createdAt: string}>
 	const talks = useGetAll("talk") as Array<{id: string, title: string, description: string, createdAt: string}>
 
-	/*
-	const attendances = _attendances.map((a: any) => {
-		const list = JSON.parse(a.attendances) as {date: string, path: string}[]
-		const last = list[list.length - 1]
-		if (last && notOlderThan(last.date, 5)) {
-			last5Min[last.path] = (last5Min[last.path] || 0) + 1
-			last5MinCount += 1
-		}
-		return list.map((b: any) => ({id: a.registration, date: b.date, path: b.path}))
-	}).flat() as Attendance[]
-
-	const stages = {
-		"/szekcio/plenaris": "Plenáris",
-		"/szekcio/szakkepzes-itmp-netacad": "Szakkepzés, ITMP, Netacad",
-		"/szekcio/digitalis-kultura": "Digitalis kultúra",
-		"/szekcio/it-felsooktatas": "IT felsőoktatás",
-		"/szekcio/digitalis-kultura-also-tagozat": "Digitalis kultúra alsó tagozat",
-	} as Record<string, string>
-	*/
-	//console.log(attendances)
-	/*
-	const sql = attendances.reduce((acc, a) => {
-		const date = a.date
-		const path = a.path
-		return `${acc}\nINSERT INTO log (registration, date, path) VALUES (${a.id}, '${date.replace("T", " ").slice(0, 19)}', '${path}');`
-	}, "")
-
-	console.log(sql)
-	*/
 	const ratings = _ratings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+	console.log({ratings})
+	
+	const peopleDidRatingRegistrationIds = ratings.map(r => r.registration)
+	console.log({peopleDidRatingRegistrationIds})
+	const peopleDidRating = regs.filter(r => peopleDidRatingRegistrationIds.includes(r.id))
+	console.log({peopleDidRating})
+	
 	const recommendedTopics = [] as Array<{recommendedTopic: string, registration: string}>
 	const comments = [] as Array<{comment: string, registration: string}>
 	const allRatings = {} as Record<string, {sum: number, count: number, talk?: {id: string, title: string}}>
@@ -68,7 +25,7 @@ const Ratings = () => {
 	const lastRatings = regIds.map(rId => ratings.find(r => r.registration === rId))
 
 	lastRatings.map(r => {
-		if (!r) return
+		if (!r) return {}
 		if (r.comment) comments.push({comment: r.comment, registration: r.registration})
 		if (r.recommendedTopic) recommendedTopics.push({recommendedTopic: r.recommendedTopic, registration: r.registration})
 		const _rs = JSON.parse(r.ratings)
@@ -125,8 +82,10 @@ const Ratings = () => {
 				<Typography variant="body1">{c.comment}</Typography>
 			</CardContent>
 		</Card>)}
-
+		<CSVExportLink registrations={peopleDidRating} fileName="iok2023_ertekelok.csv"  buttonTitle="Értékelő vendégek exportálása CSV fájlba" />
 	</>
 }
+
+
 
 export default Ratings
