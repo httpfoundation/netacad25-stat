@@ -1,7 +1,7 @@
 {
   "name": "demo",
   "version": "0.1.0",
-  "homepage": "https://iok2022.http-alapitvany.hu",
+  "homepage": "https://stat.25.netacad.hu",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.8.2",
